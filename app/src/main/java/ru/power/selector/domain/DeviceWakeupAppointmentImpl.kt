@@ -1,19 +1,20 @@
 package ru.power.selector.domain
 
+import android.util.Log
 import java.io.DataOutputStream
 
 class DeviceWakeupAppointmentImpl : IDeviceWakeupAppointment {
 
     override fun setTime(time: Long) {
+        Log.d(this::class.java.name, "set time ${(time - System.currentTimeMillis()) / 1000}")
         if (time < 0) {
             return
         }
-        cancelTime()
 
         var process: Process? = null
         var os: DataOutputStream? = null
         try {
-            val command = "echo +$time > /sys/class/rtc/rtc0/wakealarm"
+            val command = "echo +${(time - System.currentTimeMillis()) / 1000} > /sys/class/rtc/rtc0/wakealarm"
             process = Runtime.getRuntime().exec("su")
             os = DataOutputStream(process.outputStream)
             os.writeBytes(
@@ -25,6 +26,7 @@ class DeviceWakeupAppointmentImpl : IDeviceWakeupAppointment {
             os.writeBytes("exit\n")
             os.flush()
             process.waitFor()
+            Log.d(this::class.java.name, "exit value ${process?.exitValue()}; wait for ${process.waitFor()}")
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {

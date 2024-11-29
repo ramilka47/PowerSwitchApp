@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import ru.power.selector.di.AppComponent
 import ru.power.selector.domain.use_case.ClearAlarmTimersUseCase
+import ru.power.selector.domain.use_case.DeviceBootCompleteUseCase
 import ru.power.selector.domain.use_case.GetTimeToAlarmUseCase
 import ru.power.selector.domain.use_case.SetAllTimeToAlarmUseCase
 import ru.power.selector.domain.use_case.SetTimeToAlarmUseCase
@@ -23,6 +24,9 @@ class ViewModelFactory(appComponent: AppComponent) : ViewModelProvider.Factory {
     @Inject
     lateinit var setTimeToAlarmUseCase: SetTimeToAlarmUseCase
 
+    @Inject
+    lateinit var deviceBootCompleteUseCase : DeviceBootCompleteUseCase
+
     init {
         appComponent.inject(this)
     }
@@ -33,7 +37,8 @@ class ViewModelFactory(appComponent: AppComponent) : ViewModelProvider.Factory {
                 clearAlarmTimersUseCase,
                 getTimeToAlarmUseCase,
                 setAllTimeToAlarmUseCase,
-                setTimeToAlarmUseCase
+                setTimeToAlarmUseCase,
+                deviceBootCompleteUseCase
             )
             SplashViewModel::class.java -> SplashViewModel()
             else -> throw Exception("view model factory with name=$modelClass don't supported")

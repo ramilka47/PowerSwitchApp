@@ -26,7 +26,7 @@ class Store(private val preferences: SharedPreferences) :
     override fun clear() {
         WEEK_LIST.forEach { week ->
             SWITCH.forEach { switch ->
-                setTime(AlarmTimer(week, switch, 0L))
+                setTime(AlarmTimer(week, switch, Int.MAX_VALUE, Int.MAX_VALUE))
             }
         }
     }
@@ -74,40 +74,103 @@ class Store(private val preferences: SharedPreferences) :
 
     private fun getTime(switch: Switch) : Long? {
         val calendar = getCurrentTime()
-        val day = calendar[Calendar.DAY_OF_WEEK]
-        val weekDay : (Int)->WeekId = {
-            when(it){
-                0 -> { WeekId.Monthly }
-                1 -> { WeekId.Tuesday }
-                2 -> { WeekId.Wednesday }
-                3 -> { WeekId.Thursday }
-                4 -> { WeekId.Friday }
-                5-> { WeekId.Saturday }
-                6 -> { WeekId.Sunday }
-                else -> {
-                    WeekId.Monthly
-                }
-            }
+
+        return getTimeByDay(calendar, switch)
+    }
+
+    private fun getTimeByDay(calendar: Calendar, switch: Switch, iter : Int = 0) : Long? {
+        if (iter == 7) {
+            return null
         }
 
-        val time = getTime(weekDay(day), switch)?.time
-        return if (time != null && time <= System.currentTimeMillis()){
-            getTime(weekDay(day + 1), switch)?.time
-        } else {
-            time
+        val weekId = weekDay(calendar[Calendar.DAY_OF_WEEK])
+        val time = getTime(weekId, switch)
+        return time?.let {
+            val hour = it.hour
+            val min = it.min
+
+            return if (hour >= 24 || min >= 60)
+                getTimeByDay(calendar.apply {
+                    isYearIterEnd()
+                    calendar[Calendar.DAY_OF_YEAR] = calendar[Calendar.DAY_OF_YEAR] + 1
+                }, switch, iter + 1)
+            else {
+                //val calendar = getCurrentTime()
+                val trueHour = calendar[Calendar.HOUR_OF_DAY]
+                val trueMinute = calendar[Calendar.MINUTE]
+
+                if (hour > trueHour) {
+                    getCurrentTime().apply {
+                        set(Calendar.DAY_OF_YEAR, calendar[Calendar.DAY_OF_YEAR])
+                        set(Calendar.HOUR_OF_DAY, hour)
+                        set(Calendar.MINUTE, min)
+                    }.timeInMillis
+                } else if (hour == trueHour) {
+                    if (min > trueMinute) {
+                        getCurrentTime().apply {
+                            set(Calendar.HOUR_OF_DAY, hour)
+                            set(Calendar.MINUTE, min)
+                        }.timeInMillis
+                    } else {
+                        getTimeByDay(calendar.isYearIterEnd().apply {
+                            calendar[Calendar.DAY_OF_YEAR] = calendar[Calendar.DAY_OF_YEAR] + 1
+                        }, switch, iter + 1)
+                    }
+                } else {
+                    getTimeByDay(calendar.isYearIterEnd().apply {
+                        calendar[Calendar.DAY_OF_YEAR] = calendar[Calendar.DAY_OF_YEAR] + 1
+                    }, switch, iter + 1)
+                }
+            }
+        } ?: getTimeByDay(calendar.isYearIterEnd().apply {
+            calendar[Calendar.DAY_OF_YEAR] = calendar[Calendar.DAY_OF_YEAR] + 1
+        }, switch, iter + 1)
+    }
+
+    private fun Calendar.isYearIterEnd() : Calendar {
+        val month = get(Calendar.MONTH)
+        if (month != Calendar.DECEMBER)
+            return this
+        val day = get(Calendar.DAY_OF_MONTH)
+        if (day != 31){
+            return this
+        }
+        set(Calendar.YEAR, get(Calendar.YEAR) + 1)
+        set(Calendar.DAY_OF_YEAR, 1)
+        return this
+    }
+
+    private fun weekDay(day : Int) : WeekId = when(day){
+        Calendar.MONDAY -> { WeekId.Monthly }
+        Calendar.TUESDAY -> { WeekId.Tuesday }
+        Calendar.WEDNESDAY -> { WeekId.Wednesday }
+        Calendar.THURSDAY -> { WeekId.Thursday }
+        Calendar.FRIDAY -> { WeekId.Friday }
+        Calendar.SATURDAY-> { WeekId.Saturday }
+        Calendar.SUNDAY -> { WeekId.Sunday }
+        else -> {
+            WeekId.Monthly
         }
     }
 
     private fun setTime(alarmTimer: AlarmTimer){
-        preferences.edit().putLong("${alarmTimer.id}_${alarmTimer.switch}", alarmTimer.time).apply()
+        preferences.edit().putString("${alarmTimer.id}_${alarmTimer.switch}", "${alarmTimer.hour}:${alarmTimer.min}").apply()
     }
 
     private fun getTime(weekId: WeekId, switch: Switch) : AlarmTimer? {
-        val time = preferences.getLong("${weekId}_$switch", 0L)
-        if (time == 0L){
+        val time = preferences.getString("${weekId}_$switch", "")
+        if (time == null || time == "${Int.MAX_VALUE}:${Int.MAX_VALUE}") {
             return null
         }
-        return AlarmTimer(weekId, switch, time)
+        val times = time.split(":")
+
+        if (times.size > 1)
+            return AlarmTimer(
+                weekId,
+                switch,
+                if (times[0].isNotBlank()) times[0].toInt() else 0,
+                if (times[1].isNotBlank()) times[1].toInt() else 0
+            ) else return null
     }
 
     private fun getCurrentTime() : Calendar =

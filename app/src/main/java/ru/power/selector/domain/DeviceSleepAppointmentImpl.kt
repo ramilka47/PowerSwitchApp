@@ -16,6 +16,9 @@ class DeviceSleepAppointmentImpl(private val context: Context) : IDeviceSleepApp
             context.applicationContext,
             0, intent, PendingIntent.FLAG_UPDATE_CURRENT
         )
+
+        alarm.cancel(pendingIntent)
+
         alarm.set(AlarmManager.RTC_WAKEUP, time, pendingIntent!!)
     }
 }

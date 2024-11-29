@@ -3,6 +3,8 @@ package ru.power.selector.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Environment
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,6 +27,7 @@ class PowerOnReceiver : BroadcastReceiver() {
         appComponent.inject(this)
 
         scope.launch {
+            Environment.getExternalStorageDirectory()
             deviceBootCompleteUseCase.execute()
         }
     }

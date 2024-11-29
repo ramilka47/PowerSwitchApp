@@ -1,8 +1,9 @@
-plugins {
+ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -63,6 +64,9 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.com.google.dagger2)
     implementation(libs.com.google.dagger2.support)
+    implementation(libs.kotlinx.serialization.json)
+
+    implementation(libs.android.compose.runtime)
 
     kapt(libs.com.google.dagger2.compiler)
     //implementation(libs.alphicc.brick)

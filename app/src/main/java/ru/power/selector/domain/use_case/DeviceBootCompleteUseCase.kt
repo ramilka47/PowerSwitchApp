@@ -16,6 +16,7 @@ class DeviceBootCompleteUseCase(
             iDeviceSleepAppointment.setAlarm(it)
         }
         iStore.getNextWakeUpTime()?.let {
+            iDeviceWakeupAppointment.cancelTime()
             iDeviceWakeupAppointment.setTime(it)
         }
             ?: iDeviceWakeupAppointment.cancelTime()
