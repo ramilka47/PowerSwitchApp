@@ -7,6 +7,7 @@ import ru.power.selector.di.module.DomainModule
 import ru.power.selector.di.module.UseCaseModule
 import ru.power.selector.receiver.PowerOffReceiver
 import ru.power.selector.receiver.PowerOnReceiver
+import ru.power.selector.receiver.SetTimerReceiver
 import ru.power.selector.ui.MainActivity
 import ru.power.selector.ui.view_model.ViewModelFactory
 import javax.inject.Singleton
@@ -24,6 +25,8 @@ interface AppComponent {
     fun inject(powerOffReceiver: PowerOffReceiver)
 
     fun inject(powerOnReceiver: PowerOnReceiver)
+
+    fun inject(setTimerReceiver : SetTimerReceiver)
 
     fun inject(mainActivity: MainActivity)
 

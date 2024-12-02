@@ -13,6 +13,7 @@ import ru.power.selector.domain.use_case.DeviceBootCompleteUseCase
 import ru.power.selector.domain.use_case.DeviceToSleepUseCase
 import ru.power.selector.domain.use_case.GetTimeToAlarmUseCase
 import ru.power.selector.domain.use_case.SetAllTimeToAlarmUseCase
+import ru.power.selector.domain.use_case.SetAllTimerBySwitchUseCase
 import ru.power.selector.domain.use_case.SetTimeToAlarmUseCase
 
 @Module
@@ -21,14 +22,15 @@ class UseCaseModule {
     @Provides
     fun provideDeviceBootComplete(
         iStore: IActionTimeStore,
-        iDeviceSleepAppointment: IDeviceSleepAppointment,
-        iDeviceWakeupAppointment: IDeviceWakeupAppointment
+        iDeviceSleepAppointment: IDeviceSleepAppointment
     ) =
-        DeviceBootCompleteUseCase(iStore, iDeviceSleepAppointment, iDeviceWakeupAppointment)
+        DeviceBootCompleteUseCase(iStore, iDeviceSleepAppointment)
 
     @Provides
-    fun provideDeviceToSleep(context: Context) =
-        DeviceToSleepUseCase(context)
+    fun provideDeviceToSleep(context: Context,
+                             iActionTimeStore : IActionTimeStore,
+                             iDeviceWakeupAppointment: IDeviceWakeupAppointment) =
+        DeviceToSleepUseCase(context, iActionTimeStore, iDeviceWakeupAppointment)
 
     @Provides
     fun provideClearAlarmTimersUseCase(iAlarmTimerSetter: IAlarmTimerSetter) =
@@ -45,4 +47,8 @@ class UseCaseModule {
     @Provides
     fun provideSetTimeToAlarmUseCase(iAlarmTimerSetter: IAlarmTimerSetter) =
         SetTimeToAlarmUseCase(iAlarmTimerSetter)
+
+    @Provides
+    fun provideSetAllTimerUseCase(setAllTimeToAlarmUseCase: SetAllTimeToAlarmUseCase) =
+        SetAllTimerBySwitchUseCase(setAllTimeToAlarmUseCase)
 }

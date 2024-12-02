@@ -23,11 +23,11 @@ class PowerOnReceiver : BroadcastReceiver() {
     lateinit var deviceBootCompleteUseCase: DeviceBootCompleteUseCase
 
     override fun onReceive(context: Context, intent: Intent) {
+        Log.d(this::class.java.name, "start")
         appComponent = Initializer.init(context)
         appComponent.inject(this)
 
         scope.launch {
-            Environment.getExternalStorageDirectory()
             deviceBootCompleteUseCase.execute()
         }
     }

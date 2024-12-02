@@ -41,7 +41,7 @@ private fun loading(viewModel: SplashViewModel, navHostController: NavHostContro
                 false->{
                     hideLoading()
                     LaunchedEffect(Unit) {
-                        navHostController.navigateUp()
+                        navHostController.clearBackStack(Destination.Splash)
                         navHostController.navigate(Destination.Power)
                     }
                 }

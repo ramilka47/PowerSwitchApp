@@ -7,18 +7,12 @@ import ru.power.selector.domain.store.IActionTimeStore
 
 class DeviceBootCompleteUseCase(
     private val iStore: IActionTimeStore,
-    private val iDeviceSleepAppointment: IDeviceSleepAppointment,
-    private val iDeviceWakeupAppointment: IDeviceWakeupAppointment
+    private val iDeviceSleepAppointment: IDeviceSleepAppointment
 ) : UseCase<Unit, Unit> {
 
     override suspend fun execute(unit : Unit, scope: CoroutineScope) {
         iStore.getNextSleepTime()?.let {
             iDeviceSleepAppointment.setAlarm(it)
         }
-        iStore.getNextWakeUpTime()?.let {
-            iDeviceWakeupAppointment.cancelTime()
-            iDeviceWakeupAppointment.setTime(it)
-        }
-            ?: iDeviceWakeupAppointment.cancelTime()
     }
 }
