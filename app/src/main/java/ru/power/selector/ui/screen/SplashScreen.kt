@@ -41,8 +41,14 @@ private fun loading(viewModel: SplashViewModel, navHostController: NavHostContro
                 false->{
                     hideLoading()
                     LaunchedEffect(Unit) {
-                        navHostController.clearBackStack(Destination.Splash)
-                        navHostController.navigate(Destination.Power)
+                        navHostController.navigate(Destination.Power){
+                            popUpTo(navHostController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                            //navHostController.clearBackStack(Destination.Splash)
+                        }
                     }
                 }
                 else->{
