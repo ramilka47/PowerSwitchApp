@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.power.selector.di.AppComponent
 import ru.power.selector.di.Initializer
+import ru.power.selector.domain.use_case.DeviceBootCompleteUseCase
 import ru.power.selector.domain.use_case.SetAllTimerBySwitchUseCase
 import ru.power.selector.domain.use_case.execute
 import ru.power.selector.ui.data.Switch
@@ -21,6 +22,8 @@ class SetTimerReceiver : BroadcastReceiver() {
 
     @Inject
     lateinit var setAllTimerBySwitchUseCase: SetAllTimerBySwitchUseCase
+    @Inject
+    lateinit var deviceBootCompleteUseCase : DeviceBootCompleteUseCase
 
     override fun onReceive(p0: Context, p1: Intent?) {
         Log.d(this::class.java.name, "onReceive")
@@ -45,6 +48,7 @@ class SetTimerReceiver : BroadcastReceiver() {
                                 wakeUpMin
                             )
                         )
+                        deviceBootCompleteUseCase.execute()
                     }
                 }
 
