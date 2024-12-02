@@ -50,8 +50,9 @@ class SetTimerReceiver : BroadcastReceiver() {
 
                 val offSwitch = it.getStringExtra("off")
                 if (offSwitch == "off") {
-                    val sleepUpHour = it.getIntExtra("sleepUpHour", Int.MAX_VALUE)
-                    val sleepUpMin = it.getIntExtra("sleepUpMin", Int.MAX_VALUE)
+                    val sleepUpHour = it.getIntExtra("sleep" +
+                            "Hour", Int.MAX_VALUE)
+                    val sleepUpMin = it.getIntExtra("sleepMin", Int.MAX_VALUE)
 
                     Log.d(this::class.java.name, "sleep $sleepUpHour && $sleepUpMin")
 

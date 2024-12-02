@@ -26,8 +26,6 @@ interface AppComponent {
 
     fun inject(powerOnReceiver: PowerOnReceiver)
 
-    fun inject(receiverActivity : ReceiverActivity)
-
     fun inject(setTimerReceiver : SetTimerReceiver)
 
     fun inject(mainActivity: MainActivity)
